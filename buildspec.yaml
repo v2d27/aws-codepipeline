@@ -1,0 +1,29 @@
+version: 0.2
+
+phases:
+  install:
+    commands:
+      - bash ./installdocker.sh
+  pre_build:
+    commands:
+      - echo "Logging into DockerHub"
+      - echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
+  build:
+    commands:
+      - tag="$(git rev-parse HEAD)_$(date + %H%M%S)"
+      - echo "Current commit hash: $tag"
+
+      - echo "Building docker image"
+      - docker build -f Dockerfile -t ${DOCKER_PATH}/${IMAGE_NAME}:$tag .
+
+      - echo "Push ${DOCKER_PATH}/${IMAGE_NAME}:$tag to DockerHub"
+      - docker push ${DOCKER_PATH}/${IMAGE_NAME}:$tag
+
+      - echo "Push ${DOCKER_PATH}/${IMAGE_NAME}:latest to DockerHub"
+      - docker tag ${DOCKER_PATH}/${IMAGE_NAME}:$tag "${DOCKER_PATH}/${IMAGE_NAME}:latest"
+      - docker push ${DOCKER_PATH}/${IMAGE_NAME}:latest
+
+  post_build:
+    commands:
+      - echo Building completely! Logging out DockerHub
+      - docker logout
