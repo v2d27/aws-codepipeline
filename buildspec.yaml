@@ -13,7 +13,7 @@ phases:
   build:
     commands:
       - tag="$(git rev-parse HEAD)_$(date + %H%M%S)"
-      - echo "Current commit hash: $tag"
+      - echo "Current commit hash $tag"
 
       - echo "Building docker image"
       - docker build -f Dockerfile -t ${DOCKER_PATH}/${IMAGE_NAME}:$tag .
