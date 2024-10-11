@@ -12,21 +12,30 @@ phases:
 
   build:
     commands:
+      - echo Calculating image name
       - time=$(date +"%H%M%S")
-      - tag="${CODEBUILD_RESOLVED_SOURCE_VERSION}_$time"
-      - echo "Current commit tag $tag"
+      - hash=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c1-8)
+      - export NOW_VERSION="${DOCKER_PATH}/${IMAGE_NAME}:$hash_$time"
+      - export LATEST_VERSION="${DOCKER_PATH}/${IMAGE_NAME}:latest"
+      - echo -e "NOW_VERSION=${NOW_VERSION}\nLATEST_VERSION=${LATEST_VERSION}"
+      - echo -e "NOW_VERSION=${NOW_VERSION}\nLATEST_VERSION=${LATEST_VERSION}" > image.txt
 
       - echo "Building docker image"
-      - docker build -f Dockerfile -t ${DOCKER_PATH}/${IMAGE_NAME}:$tag .
+      - docker build -f Dockerfile -t $NOW_VERSION .
 
-      - echo "Push ${DOCKER_PATH}/${IMAGE_NAME}:$tag to DockerHub"
-      - docker push ${DOCKER_PATH}/${IMAGE_NAME}:$tag
+      - echo "Push $NOW_VERSION to DockerHub"
+      - docker push $NOW_VERSION
 
-      - echo "Push ${DOCKER_PATH}/${IMAGE_NAME}:latest to DockerHub"
-      - docker tag ${DOCKER_PATH}/${IMAGE_NAME}:$tag "${DOCKER_PATH}/${IMAGE_NAME}:latest"
-      - docker push ${DOCKER_PATH}/${IMAGE_NAME}:latest
+      - echo "Push $LATEST_VERSION to DockerHub"
+      - docker tag $NOW_VERSION $LATEST_VERSION
+      - docker push $LATEST_VERSION
 
   post_build:
     commands:
-      - echo Building completely! Logging out DockerHub
+      - echo Logging out DockerHub
       - docker logout
+
+artifacts:
+  files:
+    - image.txt
+  name: artifact-image
