@@ -7,35 +7,35 @@ phases:
       
   pre_build:
     commands:
-      - echo Logging in ECR
-      - aws ecr get-login --no-include-email --region $AWS_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
-
-      - echo Calculating image name
-      - time=$(date +"%H%M%S")
-      - hash=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c1-8)
-      - export NOW_VERSION="${IMAGE_NAME}:$hash_$time"
-      - export LATEST_VERSION="${IMAGE_NAME}:latest"
-      - echo -e "NOW_VERSION=${NOW_VERSION}\nLATEST_VERSION=${LATEST_VERSION}"
-      - echo -e "NOW_VERSION=${NOW_VERSION}\nLATEST_VERSION=${LATEST_VERSION}" > image.txt
+      - echo "Logging into DockerHub"
+      - echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
 
   build:
     commands:
+      - echo Calculating image name
+      - time=$(date +"%H%M%S")
+      - hash=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c1-8)
+      - export NOW_VERSION="${DOCKER_PATH}/${IMAGE_NAME}:$hash_$time"
+      - export LATEST_VERSION="${DOCKER_PATH}/${IMAGE_NAME}:latest"
+      - echo -e "NOW_VERSION=${NOW_VERSION}\nLATEST_VERSION=${LATEST_VERSION}"
+      - echo -e "NOW_VERSION=${NOW_VERSION}\nLATEST_VERSION=${LATEST_VERSION}" > image.txt
+
       - echo "Building docker image"
       - docker build -f Dockerfile -t $NOW_VERSION .
 
-      - echo "Push $NOW_VERSION to ECR"
+      - echo "Push $NOW_VERSION to DockerHub"
       - docker push $NOW_VERSION
 
-      - echo "Push $LATEST_VERSION to ECR"
+      - echo "Push $LATEST_VERSION to DockerHub"
       - docker tag $NOW_VERSION $LATEST_VERSION
       - docker push $LATEST_VERSION
 
   post_build:
     commands:
-      - echo Logging out ECR
+      - echo Logging out DockerHub
       - docker logout
 
 artifacts:
-  base-directory: artifacts
   files:
     - image.txt
+  name: artifact-image
