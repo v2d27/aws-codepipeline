@@ -1,35 +1,31 @@
 version: 0.2
 
 phases:
-  install:
-    commands:
-      - bash ./installdocker.sh
-      
   pre_build:
     commands:
-      - echo Logging in ECR
-      - aws ecr get-login --no-include-email --region $AWS_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
+      - echo Logging in AWS ECR
+      - aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
 
-      - echo Calculating image name
-      - time=$(date +"%H%M%S")
-      - hash=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c1-8)
-      - export NOW_VERSION="${IMAGE_NAME}:$hash_$time"
-      - export LATEST_VERSION="${IMAGE_NAME}:latest"
-      - echo -e "NOW_VERSION=${NOW_VERSION}\nLATEST_VERSION=${LATEST_VERSION}"
-      - echo -e "NOW_VERSION=${NOW_VERSION}\nLATEST_VERSION=${LATEST_VERSION}" > image.txt
+      - echo Calculating image uri
+      - TAG="$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c1-8)_$(date +"%Y%m%d_%H%M%S")"
+
+      - export IMAGE="${IMAGE_NAME}:$TAG"
+      - export IMAGE_LATEST="${IMAGE_NAME}:latest"
+
+      - echo -e "IMAGE=${IMAGE}\nIMAGE_LATEST=${IMAGE_LATEST}" > image_uri.txt
+      - cat image_uri.txt
 
   build:
     commands:
       - echo "Building docker image"
-      - docker build -f Dockerfile -t $NOW_VERSION .
+      - docker build -f Dockerfile -t $IMAGE .
+      - docker tag $IMAGE $IMAGE_LATEST
 
-      - echo "Push $NOW_VERSION to ECR"
-      - docker push $NOW_VERSION
+      - echo "Push $IMAGE to ECR"
+      - docker push $IMAGE
 
-      - echo "Push $LATEST_VERSION to ECR"
-      - docker tag $NOW_VERSION $LATEST_VERSION
-      - docker push $LATEST_VERSION
-
+      - echo "Push $IMAGE_LATEST to AWS ECR"
+      - docker push $IMAGE_LATEST
   post_build:
     commands:
       - echo Logging out ECR
@@ -38,4 +34,4 @@ phases:
 artifacts:
   base-directory: artifacts
   files:
-    - image.txt
+    - image_uri.txt
