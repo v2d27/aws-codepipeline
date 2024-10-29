@@ -32,6 +32,6 @@ phases:
       - docker logout
 
 artifacts:
-  base-directory: artifacts
+  base-directory: .
   files:
     - image_uri.txt
