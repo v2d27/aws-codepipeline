@@ -33,3 +33,8 @@ phases:
 
       - echo Update appspec.yaml file 
       - bash build-appspec.sh $TASK_DEFINITION $CONTAINER_NAME $CONTAINER_PORT
+
+artifacts:
+  base-directory: .
+  files:
+    - appspec.yaml
