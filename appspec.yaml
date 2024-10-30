@@ -1,0 +1,12 @@
+version: 0.0
+resources:
+  - TargetService:
+      Type: AWS::ECS::Service
+      Properties:
+        TaskDefinition: "<TASK_DEFINITION>"
+        LoadBalancerInfo:
+          ContainerName: "<CONTAINER_NAME>"
+          ContainerPort: <CONTAINER_PORT>
+        PlatformVersion: "LATEST"
+
+# This is sample file. AWS CodePipeline will generate and update all parameters when running

@@ -31,7 +31,10 @@ phases:
       - echo Logging out ECR
       - docker logout
 
-artifacts:
-  base-directory: .
-  files:
-    - image_uri.txt
+      - echo Update appspec.yaml file 
+      - bash build-appspec.sh $TASK_DEFINITION $CONTAINER_NAME $CONTAINER_PORT
+
+# artifacts:
+#   base-directory: .
+#   files:
+#     - image_uri.txt
