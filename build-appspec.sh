@@ -21,14 +21,15 @@ resources:
           ContainerName: \"${CONTAINER_NAME}\"
           ContainerPort: ${CONTAINER_PORT}
         PlatformVersion: \"LATEST\"
-hooks:
-  BeforeAllowTraffic:
-    - location: before_allow_traffic.sh
-      timeout: ${SHIFTTRAFFIC_TIMEOUT}
-      runas: root
-      args:
-        - ${SHIFTTRAFFIC_TIMEOUT}
 " > $APPSPEC_FILE
+
+# hooks:
+#   BeforeAllowTraffic:
+#     - location: before_allow_traffic.sh
+#       timeout: ${SHIFTTRAFFIC_TIMEOUT}
+#       runas: root
+#       args:
+#         - \"${SHIFTTRAFFIC_TIMEOUT}\"
 
 echo "Updating ${APPSPEC_FILE} content-----------------------------------"
 cat $APPSPEC_FILE
