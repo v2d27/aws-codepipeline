@@ -8,5 +8,12 @@ resources:
           ContainerName: "<CONTAINER_NAME>"
           ContainerPort: <CONTAINER_PORT>
         PlatformVersion: "LATEST"
-
-# This is sample file. AWS CodePipeline will generate and update all parameters when running
+hooks:
+  BeforeAllowTraffic:
+    - location: before_allow_traffic.sh
+      timeout: 600
+      runas: root
+      args:
+        - 600
+        
+# This is sample file. AWS CodeBuild will generate and update all parameters when running

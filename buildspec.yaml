@@ -32,7 +32,7 @@ phases:
       - docker logout
 
       - echo Update appspec.yaml file 
-      - bash build-appspec.sh $TASK_DEFINITION $CONTAINER_NAME $CONTAINER_PORT
+      - bash build-appspec.sh $TASK_DEFINITION $CONTAINER_NAME $CONTAINER_PORT $SHIFTTRAFFIC_TIMEOUT
 
 artifacts:
   base-directory: .
