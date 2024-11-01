@@ -12,7 +12,7 @@ SHIFTTRAFFIC_TIMEOUT=$4
 APPSPEC_FILE="appspec.yaml"
 
 echo "version: 0.0
-resources:
+Resources:
   - TargetService:
       Type: AWS::ECS::Service
       Properties:
@@ -20,8 +20,7 @@ resources:
         LoadBalancerInfo:
           ContainerName: \"${CONTAINER_NAME}\"
           ContainerPort: ${CONTAINER_PORT}
-        PlatformVersion: \"LATEST\"
-" > $APPSPEC_FILE
+        PlatformVersion: \"LATEST\"" > $APPSPEC_FILE
 
 # hooks:
 #   BeforeAllowTraffic:
@@ -34,3 +33,28 @@ resources:
 echo "Updating ${APPSPEC_FILE} content-----------------------------------"
 cat $APPSPEC_FILE
 echo "-----------------------------------------------------------------"
+
+
+# version: 0.0
+# Resources:
+#   - TargetService:
+#       Type: AWS::ECS::Service
+#       Properties:
+#         TaskDefinition: "arn:aws:ecs:us-east-1:111222333444:task-definition/my-task-definition-family-name:1"
+#         LoadBalancerInfo:
+#           ContainerName: "SampleApplicationName"
+#           ContainerPort: 80
+# # Optional properties
+#         PlatformVersion: "LATEST"
+#         NetworkConfiguration:
+#           AwsvpcConfiguration:
+#             Subnets: ["subnet-1234abcd","subnet-5678abcd"]
+#             SecurityGroups: ["sg-12345678"]
+#             AssignPublicIp: "ENABLED"
+#         CapacityProviderStrategy:
+#           - Base: 1
+#             CapacityProvider: "FARGATE_SPOT"
+#             Weight: 2
+#           - Base: 0
+#             CapacityProvider: "FARGATE"
+#             Weight: 1
